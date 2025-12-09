@@ -2,151 +2,419 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StarHub</title>
+    <title>StarHub | Command Center</title>
+    
+    <!-- Icons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+        /* --- APPLE-STYLE CSS VARIABLES --- */
+        :root {
+            --bg-color: #000000;
+            --card-bg: rgba(28, 28, 30, 0.6);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #86868b;
+            --accent-blue: #2997ff;
+            --accent-purple: #bf5af2;
+            --accent-pink: #ff375f;
+            --accent-cyan: #32ade6;
+            --glass-blur: blur(25px);
+        }
+
+        /* --- RESET & BASE --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* --- BACKGROUND EFFECTS --- */
+        .background-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(41, 151, 255, 0.15), transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(191, 90, 242, 0.15), transparent 40%);
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            z-index: 100;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo i { color: var(--accent-cyan); font-size: 1.8rem; }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover { color: var(--text-primary); }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #fff 0%, #888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            max-width: 900px;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: 50px;
+            line-height: 1.4;
+        }
+
+        /* --- THE BENTO GRID (The Hub) --- */
+        .hub-section {
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        /* Special layout for the first row to span columns if needed */
+        .bento-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 350px;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: var(--glass-blur);
+        }
+
+        .bento-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .card-content h3 { font-size: 1.8rem; margin-bottom: 10px; font-weight: 600; }
+        .card-content p { color: var(--text-secondary); font-size: 1rem; line-height: 1.5; }
+        
+        .card-link {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        
+        .bento-card:hover .card-link { background: var(--text-primary); color: #000; }
+
+        /* Specific Card Styles */
+        .card-pi { grid-column: span 2; background: linear-gradient(135deg, rgba(41,151,255,0.1), rgba(0,0,0,0)); }
+        .card-fan { background: linear-gradient(135deg, rgba(255,55,95,0.1), rgba(0,0,0,0)); }
+        .card-cam { background: linear-gradient(135deg, rgba(191,90,242,0.1), rgba(0,0,0,0)); }
+
+        @media (max-width: 768px) {
+            .card-pi { grid-column: span 1; }
+            .hero h1 { font-size: 2.5rem; }
+        }
+
+        /* --- LIBRARY SECTION (Books) --- */
+        .library-section {
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .book-card {
+            background: #111;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            transition: transform 0.3s;
+        }
+
+        .book-card:hover { transform: translateY(-5px); }
+
+        .book-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+            background: #222; /* Placeholder color */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+        }
+        
+        /* If you have real images, they will cover this */
+        .book-image img { width: 100%; height: 100%; object-fit: cover; }
+
+        .book-info { padding: 20px; }
+        .book-info h4 { font-size: 1.2rem; margin-bottom: 5px; }
+        .book-info p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px; }
+        
+        .btn-small {
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            text-align: center;
+            padding: 50px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--card-border);
+        }
+
+        footer span { color: var(--accent-cyan); }
+
+    </style>
 </head>
 <body>
+
+    <!-- Ambient Background -->
+    <div class="background-glow"></div>
+
+    <!-- Navigation -->
     <nav>
         <a href="#" class="logo">
-            <box-icon name='game' type='solid' color='#00FFFF' ></box-icon>StarHub<span>/></span>
+            <i class='bx bxs-planet'></i> StarHub
         </a>
-        <div class="menuToggle" onclick="toggleMenu()">
+        <div class="nav-links">
+            <a href="#hub">Hub</a>
+            <a href="#library">Library</a>
+            <a href="#contact">Contact</a>
         </div>
-        <ul class="navigation">
-            <li><a href="#banner" onclick="toggleMenu()">Home</a></li>
-<!--             <li><a href="#about" onclick="toggleMenu()">About</a></li> -->
-            <li><a href="#games" onclick="toggleMenu()">Book</a></li>
-<!--             <li><a href="#merchandise" onclick="toggleMenu()">Merchandise</a></li> -->
-            <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
-
-        </ul>
     </nav>
-    <section class="banner" id="banner">
-        <div class="content">
-            <h2>
-                The Star Hub Is The Complete Exploration Of Freedom Within A Restrictive Environment
-            </h2>
-            <p>Lorem ipsum dolor sit amet consectetur tenetur repellat. Soluta rerum nesciunt autem. At asperiores.</p>
-            <div id="section10" class="demo">
-                <a href="#about"><span></span></a>
-            </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Exploration of Freedom <br>Within Constraints.</h1>
+        <p>The central command for the StarHub network. Monitor systems, access resources, and explore the digital frontier.</p>
+        
+        <!-- Animated Scroll Down Indicator -->
+        <div style="margin-top: 40px; animation: bounce 2s infinite;">
+            <i class='bx bx-chevron-down' style="font-size: 2rem; color: var(--text-secondary);"></i>
         </div>
     </section>
 
+    <!-- The Hub (Bento Grid) -->
+    <section id="hub" class="hub-section">
+        <h2 class="section-title">Command Center</h2>
+        
+        <div class="bento-grid">
+            
+            <!-- 1. Raspberry Pi System Status (Large Card) -->
+            <a href="https://raspi51.starhub.vip" class="bento-card card-pi">
+                <div class="card-icon" style="background: rgba(41,151,255,0.2); color: var(--accent-blue);">
+                    <i data-lucide="cpu"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Raspi-51 Status</h3>
+                    <p>Real-time telemetry of the home server. Monitor CPU load, memory usage, storage capacity, and core temperatures.</p>
+                </div>
+                <div class="card-link"><i data-lucide="arrow-up-right"></i></div>
+            </a>
 
+            <!-- 2. Security Camera -->
+            <a href="https://raspi51.starhub.vip/camera" class="bento-card card-cam">
+                <div class="card-icon" style="background: rgba(191,90,242,0.2); color: var(--accent-purple);">
+                    <i data-lucide="cctv"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Security Feed</h3>
+                    <p>Live YOLOv8 AI object tracking. View time-lapses and detected event history.</p>
+                </div>
+                <div class="card-link"><i data-lucide="arrow-up-right"></i></div>
+            </a>
 
-           <!-- merchandise  -->
-    <section class="merchandise" id="merchandise">
-        <div class="title">
-            <lord-icon
-                src="https://cdn.lordicon.com/ippkhukl.json"
-                trigger="loop"
-                colors="primary:#00ffff,secondary:#ffffff"
-                style="width: 50px;height: 50px;">
-            </lord-icon>
-            <h2 class="title-text">Electrical Engineering <span>Books</span></h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quisquam fugiat nemo qui.</p>
+            <!-- 3. Fan's World -->
+            <a href="https://fan.starhub.vip" class="bento-card card-fan">
+                <div class="card-icon" style="background: rgba(255,55,95,0.2); color: var(--accent-pink);">
+                    <i data-lucide="heart"></i>
+                </div>
+                <div class="card-content">
+                    <h3>Fan's World</h3>
+                    <p>The personal space for Fan. Explore blogs, photos, and updates from the co-pilot of StarHub.</p>
+                </div>
+                <div class="card-link"><i data-lucide="arrow-up-right"></i></div>
+            </a>
+
         </div>
-        <div class="content">
-            <div class="box box-1" data-aos="zoom-out-down">
-                <div class="imgBx">
-                    <img src="media/books/pozar.jpg" alt="">
-                </div>
-                <div class="text">
-                    <h3>Microwave Engineering</h3>
-                    <p>Focusing on the design of microwave circuits and components, this valuable reference offers professionals and students an introduction to the fundamental concepts necessary for real world design. </p>
-                </div>
-                <a href="https://www.amazon.com/Microwave-Engineering-David-M-Pozar/dp/0470631554" class="know">Know More</a>
-            </div>
-            <div class="box box-2" data-aos="zoom-out-down">
-                <div class="imgBx">
-                    <img src="media/books/razavi.jpg" alt="">
-                </div>
-                <div class="text">
-                    <h3>Design of Analog CMOS</h3>
-                    <p>Dealing with the analysis and design of analog CMOS integrated circuits, emphasizing recent technological developments and design paradigms that students and practicing engineers need to master to succeed in today's industry.</p>
-                </div>
-                <a href="https://www.amazon.com/Design-Analog-CMOS-Integrated-Razavi/dp/0071188398" class="know">Know More</a>
-            </div>
-            <div class="box box-3" data-aos="zoom-out-down">
-                <div class="imgBx">
-                    <img src="media/books/bilibili.png" alt="">
-                </div>
-                <div class="text">
-                    <h3>Bilibili</h3>
-                    <p>The TOP 1 Anime Platform in Southeast Asia, with the largest licensed anime titles, offers you the ultimate anime viewing experience with multilingual support.</p>
-                </div>
-                <a href="https://www.bilibili.com/" class="know">Know More</a>
-            </div>
-    </section> -->
-
-
-    <!-- contact  -->
-    <section class="contact" id="contact">
-        <div class="content">
-            <div class="text">
-                <h3>Send Me A Message</h3>
-                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nobis a impedit nulla neque alias temporibus.</p>
-            </div>
-            <div class="contactForm">
-                <form action="mesage.php">
-                    <div class="row100">
-                        <div class="inputBox50">
-                            <input type="text" name="fullname" id="" placeholder="Full Name">
-                        </div>
-                        <div class="inputBox50">
-                            <input type="email" name="fullname" id="" placeholder="Email Adress">
-                        </div>
-                    </div>
-                    <div class="row100">
-                        <div class="inputBox100">
-                            <textarea name="messages" placeholder="Message"></textarea>
-                        </div>
-                    </div>
-                    <div class="row100">
-                        <div class="inputBox100">
-                            <input type="submit" value="Send">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="social">
-                <li><a href="https://www.linkedin.com/in/sida-li-43115597/"><img src="media/icon/linkedin.png" alt=""></a></li>
-                <li><a href="https://www.instagram.com/"><img src="media/icon/instagram.png" alt=""></a></li>
-                <li><a href="#"><img src="media/icon/facebook.png" alt=""></a></li>
-            </div>
-        </div>
-        <p class="copyright">Desgin & Developed By<a href="https://github.com/miraclestar43/"> Star</a></p>
     </section>
-    <!-- ----- -->
 
+    <!-- Library Section -->
+    <section id="library" class="library-section">
+        <h2 class="section-title">Knowledge Base</h2>
+        <div class="book-grid">
+            
+            <!-- Book 1 -->
+            <div class="book-card">
+                <div class="book-image">
+                    <!-- Replace src with your actual image path -->
+                    <img src="media/books/pozar.jpg" alt="Microwave Engineering" onerror="this.style.display='none'">
+                    <i data-lucide="book-open" style="display: none; display: block;"></i> <!-- Fallback icon -->
+                </div>
+                <div class="book-info">
+                    <h4>Microwave Engineering</h4>
+                    <p>David M. Pozar. The definitive guide to RF and microwave design fundamentals.</p>
+                    <a href="https://www.amazon.com/Microwave-Engineering-David-M-Pozar/dp/0470631554" class="btn-small">Learn More</a>
+                </div>
+            </div>
 
+            <!-- Book 2 -->
+            <div class="book-card">
+                <div class="book-image">
+                    <img src="media/books/razavi.jpg" alt="Analog CMOS" onerror="this.style.display='none'">
+                    <i data-lucide="book-open" style="display: none; display: block;"></i>
+                </div>
+                <div class="book-info">
+                    <h4>Analog CMOS Design</h4>
+                    <p>Behzad Razavi. Essential paradigms for integrated circuit architecture.</p>
+                    <a href="https://www.amazon.com/Design-Analog-CMOS-Integrated-Razavi/dp/0071188398" class="btn-small">Learn More</a>
+                </div>
+            </div>
 
-    <!-- script -->
-    <script src="https://unpkg.com/boxicons@2.1.1/dist/boxicons.js"></script>
-    <script src="https://cdn.lordicon.com/libs/mssddfmo/lord-icon-2.1.0.js"></script>
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+            <!-- Bilibili -->
+            <div class="book-card">
+                <div class="book-image" style="background: #23ade5;">
+                    <img src="media/books/bilibili.png" alt="Bilibili" onerror="this.style.display='none'">
+                    <i class='bx bxs-tv' style="font-size: 3rem; color: white;"></i>
+                </div>
+                <div class="book-info">
+                    <h4>Bilibili</h4>
+                    <p>The premier anime and creative platform for Southeast Asia.</p>
+                    <a href="https://www.bilibili.com/" class="btn-small">Watch Now</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <p>Design & Developed By <a href="https://github.com/miraclestar43/" style="color: white; font-weight: bold;">Star</a></p>
+        <div style="margin-top: 20px; display: flex; justify-content: center; gap: 20px; font-size: 1.5rem;">
+            <a href="https://www.linkedin.com/in/sida-li-43115597/"><i class='bx bxl-linkedin'></i></a>
+            <a href="https://www.instagram.com/"><i class='bx bxl-instagram'></i></a>
+            <a href="#"><i class='bx bxl-github'></i></a>
+        </div>
+        <p style="margin-top: 20px; font-size: 0.8rem; opacity: 0.5;">&copy; 2025 StarHub Network</p>
+    </footer>
+
+    <!-- Initialize Lucide Icons -->
     <script>
-        AOS.init({
-            offset: 300,
-            duration: 2000,
-        });
-    </script>
-    <script type="text/javascript">
-        window.addEventListener('scroll',function(){
-            const header = document.querySelector('nav');
-            header.classList.toggle("sticky",window.scrollY > 0);
-        })
-        function toggleMenu(){
-            const menuToggle = document.querySelector('.menuToggle');
-            const navigation = document.querySelector('.navigation');
-            menuToggle.classList.toggle('active')
-            navigation.classList.toggle('active')
-        }
+        lucide.createIcons();
+        
+        // Simple bounce animation style
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes bounce {
+                0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+                40% {transform: translateY(-10px);}
+                60% {transform: translateY(-5px);}
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
